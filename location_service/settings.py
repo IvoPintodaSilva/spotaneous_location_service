@@ -36,6 +36,8 @@ STATIC_URL = '/static/'
 
 INSTALLED_APPS = (
     'wpadmin',
+    'rest_framework',
+    'rest_framework_swagger',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +50,7 @@ INSTALLED_APPS = (
     'events',
     'interests',
     'custom_users',
+    'api',
 
 )
 

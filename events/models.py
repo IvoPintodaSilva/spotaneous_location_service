@@ -18,11 +18,11 @@ class Event(models.Model):
     host = models.ForeignKey(CustomUser, related_name='event_host')
     attending = models.ManyToManyField(CustomUser, blank= True, related_name='event_attending')
     beggining = models.DateTimeField()
-    end = models.DateTimeField(blank=True)
-    cost = models.IntegerField(blank=True)
+    end = models.DateTimeField(blank=True, null=True)
+    cost = models.IntegerField(blank=True, null=True)
     type = models.CharField(max_length=10, choices=TYPE)
     min_people = models.IntegerField()
-    max_people = models.IntegerField(blank=True)
+    max_people = models.IntegerField(blank=True, null=True)
     objects = models.GeoManager()
 
 
