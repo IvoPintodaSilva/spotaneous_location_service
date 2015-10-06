@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'interests',
     'custom_users',
     'api',
+    'multimedia',
 
 )
 
@@ -133,3 +134,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# restframework pagination settings
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}

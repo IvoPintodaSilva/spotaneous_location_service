@@ -1,17 +1,15 @@
 from rest_framework import serializers
-from events.models import Event
-from custom_users.serializers import CustomUserSerializer
+from custom_users.models import CustomUser
 from interests.serializers import InterestSerializer
 import geojson
 
-class EventSerializer(serializers.ModelSerializer):
-    host = CustomUserSerializer()
-    attending = CustomUserSerializer(many=True)
-    interest = InterestSerializer()
+class CustomUserSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField('get_geojson')
+    interests = InterestSerializer(many=True)
 
     class Meta:
-        model = Event
+        model = CustomUser
+        exclude = ('password', 'is_superuser', 'is_staff', 'groups', 'user_permissions', )
 
     def get_geojson(self, obj):
         if not obj or not obj.location:
