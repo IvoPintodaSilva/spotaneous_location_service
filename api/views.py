@@ -7,13 +7,14 @@ from custom_users.serializers import CustomUserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+from django.views.decorators.csrf import csrf_exempt
 
 
 class EventAttending(generics.ListCreateAPIView):
     """<b>Attending Events</b>"""
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'delete']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -52,6 +53,42 @@ class EventAttending(generics.ListCreateAPIView):
         except:
             self.queryset = []
         return self.list(request)
+
+
+    def delete(self, request, pk=None):
+        """
+        User is not attending an event anymore
+
+
+
+        <b>Details</b>
+
+        METHODS : DELETE
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        print request.META
+
+        try:
+            int_pk = int(pk)
+            user = CustomUser.objects.get(pk=int_pk)
+            event = Event.objects.get(pk = request.data['event_id'])
+            event.attending.remove(user)
+            return Response(status=status.HTTP_200_OK)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventByHost(generics.ListCreateAPIView):
@@ -134,7 +171,7 @@ class EventDetails(generics.ListCreateAPIView):
     """<b>Event Details</b>"""
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'delete']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -144,7 +181,7 @@ class EventDetails(generics.ListCreateAPIView):
 
     def get(self, request, pk=None):
         """
-        Gets Event for a given pk
+        Gets Event
 
 
 
@@ -170,11 +207,41 @@ class EventDetails(generics.ListCreateAPIView):
         return self.list(request)
 
 
+    def delete(self, request, pk=None):
+        """
+        Deletes an event
+
+
+
+        <b>Details</b>
+
+        METHODS : DELETE
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+        try:
+            int_pk = int(pk)
+            Event.objects.filter(pk = int_pk).delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 class InterestList(generics.ListCreateAPIView):
     """<b>Interest List</b>"""
     queryset = Interest.objects.all()
     serializer_class = InterestSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'post']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -203,6 +270,37 @@ class InterestList(generics.ListCreateAPIView):
         - form
         """
         return self.list(request)
+
+    @csrf_exempt
+    def post(self, request):
+        """
+        Creates an Interest
+
+
+
+        <b>Details</b>
+
+        METHODS : POST
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        if 'name' in request.data:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class InterestDetails(generics.ListCreateAPIView):
@@ -249,7 +347,7 @@ class InterestByUser(generics.ListCreateAPIView):
     """<b>Interests of user</b>"""
     queryset = Interest.objects.all()
     serializer_class = InterestSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'delete', 'put']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -283,6 +381,97 @@ class InterestByUser(generics.ListCreateAPIView):
         except:
             self.queryset = []
         return self.list(request)
+
+    @csrf_exempt
+    def delete(self, request, pk=None):
+        """
+        Deletes Interest for a given user
+
+
+
+        <b>Details</b>
+
+        METHODS : DELETE
+
+
+
+
+        Example:
+
+        {
+
+        "interest_id": 2
+
+        }
+
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        try:
+
+            int_pk = int(pk)
+            interest = Interest.objects.get(pk = request.data['interest_id'])
+            CustomUser.objects.get(pk = int_pk).interests.remove(interest)
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+    @csrf_exempt
+    def put(self, request, pk=None):
+        """
+        Adds Interest to a given user
+
+
+
+        <b>Details</b>
+
+        METHODS : PUT
+
+
+
+
+        Example:
+
+        {
+
+        "interest_id": 2
+
+        }
+
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        try:
+
+            int_pk = int(pk)
+            interest = Interest.objects.get(pk = request.data['interest_id'])
+            CustomUser.objects.get(pk = int_pk).interests.add(interest)
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(generics.ListCreateAPIView):
