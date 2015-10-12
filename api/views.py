@@ -255,7 +255,7 @@ class EventList(generics.ListCreateAPIView):
         ##### NOT WORKING STILL!!!
 
 
-        if 'title' in request.data and 'subtitle' in request.data and 'description' in request\
+        if 'title' in request.data and 'subtitle' in request.data and 'description' in request.data\
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
                 and 'host' in request.data and 'beggining' in request.data and "type" in request.data and \
                 'min_people' in request.data:
@@ -290,7 +290,7 @@ class EventDetails(generics.ListCreateAPIView):
     """<b>Event Details</b>"""
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    allowed_methods = ['get', 'delete']
+    allowed_methods = ['get', 'delete', 'put']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -351,6 +351,68 @@ class EventDetails(generics.ListCreateAPIView):
         try:
             int_pk = int(pk)
             Event.objects.filter(pk = int_pk).delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+    def put(self, request, pk=None):
+        """
+        Edits an event
+
+
+
+        <b>Details</b>
+
+        METHODS : PUT
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        try:
+            int_pk = int(pk)
+            event = Event.objects.get(pk = int_pk)
+
+            if 'title' in request.data:
+                event.title = request.data['title']
+
+            if 'subtitle' in request.data:
+                event.subtitle = request.data['subtitle']
+
+            if 'description' in request.data:
+                event.description = request.data['description']
+
+            if 'interest' in request.data:
+                event.interest = request.data['interest']
+
+            #if 'latitude' in request.data and 'longitude' in request.data:
+            #    location = ...
+
+            #if 'beggining' in request.data:
+            #    event.beggining = ...
+
+            if "type" in request.data:
+                event.type = request.data['type']
+
+            if 'min_people' in request.data:
+                event.min_people = request.data['min_people']
+
+            if 'max_people' in request.data:
+                event.max_people = request.data['max_people']
+
+            event.save()
+
             return Response(status=status.HTTP_200_OK)
         except:
             pass
