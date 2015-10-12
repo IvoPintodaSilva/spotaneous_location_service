@@ -14,7 +14,7 @@ class EventAttending(generics.ListCreateAPIView):
     """<b>Attending Events</b>"""
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    allowed_methods = ['get', 'delete']
+    allowed_methods = ['get', 'delete', 'put']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -90,6 +90,49 @@ class EventAttending(generics.ListCreateAPIView):
             pass
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, pk=None):
+        """
+        Associates a user to attend an event
+
+
+
+        <b>Details</b>
+
+        METHODS : PUT
+
+
+
+        {
+
+            "event_id": 3
+
+        }
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        print request.META
+
+        try:
+            int_pk = int(pk)
+            user = CustomUser.objects.get(pk=int_pk)
+            event = Event.objects.get(pk=request.data['event_id'])
+            event.attending.add(user)
+            return Response(status=status.HTTP_200_OK)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class EventByHost(generics.ListCreateAPIView):
     """<b>Events by host</b>"""
@@ -136,7 +179,7 @@ class EventList(generics.ListCreateAPIView):
     """<b>Event List</b>"""
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'post']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -165,6 +208,82 @@ class EventList(generics.ListCreateAPIView):
         - form
         """
         return self.list(request)
+
+    @csrf_exempt
+    def post(self, request):
+        """
+        Creates an Event
+
+
+
+        <b>Details</b>
+
+        METHODS : POST
+
+
+
+        {
+            "title": "New Event",
+            "subtitle": "Subtitle of new event",
+            "description": "Description of new event",
+            "interest": 2,
+            "latitude": 8.99309210,
+            "longitude": 9.3019203,
+            "host": 3,
+            "attending": 3,
+            "beggining": "25062015T23:10:32",
+            "end": "25062015T23:10:32",
+            "cost": 4,
+            "type": "PUB",
+            "min_people": 2,
+            "max_people": 5
+        }
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        ##### NOT WORKING STILL!!!
+
+
+        if 'title' in request.data and 'subtitle' in request.data and 'description' in request\
+                and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
+                and 'host' in request.data and 'beggining' in request.data and "type" in request.data and \
+                'min_people' in request.data:
+
+            try:
+
+                event = Event.objects.create(title = request.data['title'],
+                                     subtitle = request.data['subtitle'],
+                                     description = request.data['description'],
+                                     interest = request.data['interest'],
+                                     #location = Geometry(request.data['longitude'], request.data['latitude']),
+                                     host = request.data['host'],
+                                     beggining = request.data['beggining'],
+                                     type = request.data['type'],
+                                     min_people = request.data['min_people'])
+
+                if 'cost' in request.data:
+                    event.cost = request.data['cost']
+
+                if 'max_people' in request.data:
+                    event.cost = request.data['max_people']
+
+                if 'end' in request.data:
+                    event.cost = request.data['end']
+
+                return Response(status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventDetails(generics.ListCreateAPIView):
@@ -236,6 +355,7 @@ class EventDetails(generics.ListCreateAPIView):
         except:
             pass
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class InterestList(generics.ListCreateAPIView):
     """<b>Interest List</b>"""
