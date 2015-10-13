@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'custom_users.CustomUser'
 
 
 # Static files (CSS, JavaScript, Images)
