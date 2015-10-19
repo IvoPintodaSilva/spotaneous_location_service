@@ -9,7 +9,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        exclude = ('password', 'is_superuser', 'is_staff', 'groups', 'user_permissions', )
 
     def get_geojson(self, obj):
         if not obj or not obj.location:
