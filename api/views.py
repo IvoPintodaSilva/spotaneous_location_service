@@ -912,3 +912,72 @@ class UserAttending(generics.ListCreateAPIView):
         except:
             self.queryset = []
         return self.list(request)
+
+
+class UserDistance(generics.ListCreateAPIView):
+    """<b>User List by distance</b>"""
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    allowed_methods = ['get']
+
+    #def finalize_response(self, request, *args, **kwargs):
+    #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
+    #    response['last_object_update'] = getListLastUpdate(self.get_queryset())
+    #    return response
+
+
+
+
+
+    def get(self, request):
+        """
+        Gets every User
+
+
+
+        <b>Details</b>
+
+        METHODS : GET
+
+
+        {
+
+        "latitude": 8.23942349,
+
+        "longitude": 9.1238971
+
+        }
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        longitude -- Longitude of point to search from
+        latitude -- Latitude of point to search from
+        interest -- Interest of event
+        ---
+        omit_parameters:
+        - form
+        """
+
+        if 'longitude' in self.request.GET.keys() and 'latitude' in self.request.GET.keys():
+            point = GEOSGeometry('POINT(' + str(request.GET['longitude']) + ' ' +
+                                                 str(request.GET['latitude']) + ')')
+
+            self.queryset = CustomUser.objects.distance(point).order_by('distance')
+
+        if 'interest' in self.request.GET.keys():
+            try:
+                users = self.queryset
+                resp = []
+                for user in users:
+                    interests = user.interests
+                    if interests and Interest.objects.get(name__iexact=request.GET['interest']) in user.interests.all():
+                        resp += [user]
+                self.queryset = resp
+            except:
+                self.queryset = []
+
+        return self.list(request)

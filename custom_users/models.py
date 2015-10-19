@@ -9,6 +9,7 @@ class CustomUser(models.Model):
     location = models.PointField(blank=True, null=True)
     interests = models.ManyToManyField(Interest, blank=True)
     ranking = models.IntegerField(default=0)
+    objects = models.GeoManager()
 
     class Meta:
         verbose_name = _("user")
