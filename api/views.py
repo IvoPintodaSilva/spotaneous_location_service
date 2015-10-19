@@ -9,6 +9,8 @@ from rest_framework import status
 from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.gis.geos import GEOSGeometry
+import json
+import dateutil.parser
 
 
 class EventAttending(generics.ListCreateAPIView):
@@ -232,8 +234,8 @@ class EventList(generics.ListCreateAPIView):
             "longitude": 9.3019203,
             "host": 3,
             "attending": 3,
-            "beggining": "25062015T23:10:32",
-            "end": "25062015T23:10:32",
+            "beggining": "2008-04-10 11:47:58",
+            "end": "'2008-04-10 11:47:58'",
             "cost": 4,
             "type": "PUB",
             "min_people": 2,
@@ -253,36 +255,39 @@ class EventList(generics.ListCreateAPIView):
         - form
         """
 
-        ##### NOT WORKING STILL!!!
-
-
         if 'title' in request.data and 'subtitle' in request.data and 'description' in request.data\
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
-                and 'host' in request.data and 'beggining' in request.data and "type" in request.data and \
+                and 'host' in request.data and 'beginning' in request.data and "type" in request.data and \
                 'min_people' in request.data:
+
+
 
             try:
 
                 event = Event.objects.create(title = request.data['title'],
-                                     subtitle = request.data['subtitle'],
-                                     description = request.data['description'],
-                                     interest = request.data['interest'],
-                                     #location = Geometry(request.data['longitude'], request.data['latitude']),
-                                     host = request.data['host'],
-                                     beggining = request.data['beggining'],
-                                     type = request.data['type'],
-                                     min_people = request.data['min_people'])
+                                             subtitle = request.data['subtitle'],
+                                             description = request.data['description'],
+                                             interest = Interest.objects.get(pk=int(request.data['interest'])),
+                                             location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
+                                                                     str(request.data['longitude']) + ')'),
+                                             host = CustomUser.objects.get(pk=int(request.data['host'])),
+                                             beginning = dateutil.parser.parse(request.data['beginning']),
+                                             type = request.data['type'],
+                                             min_people = request.data['min_people'])
 
                 if 'cost' in request.data:
                     event.cost = request.data['cost']
 
                 if 'max_people' in request.data:
-                    event.cost = request.data['max_people']
+                    event.max_people = request.data['max_people']
 
                 if 'end' in request.data:
-                    event.cost = request.data['end']
+                    event.end = dateutil.parser.parse(request.data['end'])
 
-                return Response(status=status.HTTP_200_OK)
+                event.save()
+
+
+                return Response(status=status.HTTP_200_OK, data=event.pk)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -680,6 +685,18 @@ class UserList(generics.ListCreateAPIView):
         METHODS : POST
 
 
+        {
+
+        "id": 20,
+
+        "latitude": 8,
+
+        "longitude":9,
+
+        "interests":["swag", "football", "fashion"]
+
+        }
+
 
         <b>RETURNS:</b>
 
@@ -692,7 +709,6 @@ class UserList(generics.ListCreateAPIView):
         - form
         """
 
-        print request.data
 
         if 'id' in request.data:
             try:
@@ -707,7 +723,18 @@ class UserList(generics.ListCreateAPIView):
                     user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
                                                  str(request.data['longitude']) + ')')
                     user.save()
-                return Response(status=status.HTTP_200_OK)
+                if 'interests' in request.data:
+                    for interest in request.data['interests']:
+                        try:
+                            i = Interest.objects.get(name__iexact=interest)
+                            user.interests.add(i)
+                            user.save()
+                        except:
+                            i = Interest.objects.create(name=interest)
+                            i.save()
+                            user.interests.add(i)
+                            user.save()
+                    return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -739,7 +766,7 @@ class UserDetails(generics.ListCreateAPIView):
     """<b>User Details</b>"""
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'put']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
@@ -770,6 +797,37 @@ class UserDetails(generics.ListCreateAPIView):
         try:
             int_pk = int(pk)
             self.queryset = self.queryset.filter(pk=int_pk)
+        except:
+            self.queryset = []
+        return self.list(request)
+
+    def put(self, request, pk=None):
+        """
+        Gets user for a given pk
+
+
+
+        <b>Details</b>
+
+        METHODS : GET
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        ---
+        omit_parameters:
+        - form
+        """
+        try:
+            int_pk = int(pk)
+            user = self.queryset.get(pk=int_pk)
+            if 'latitude' in request.data and 'longitude' in request.data:
+                    user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
+                                                 str(request.data['longitude']) + ')')
+                    user.save()
         except:
             self.queryset = []
         return self.list(request)

@@ -17,7 +17,7 @@ class Event(models.Model):
     location = models.PointField(blank=True, null=True)
     host = models.ForeignKey(CustomUser, related_name='event_host')
     attending = models.ManyToManyField(CustomUser, blank= True, related_name='event_attending')
-    beggining = models.DateTimeField()
+    beginning = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
     cost = models.IntegerField(blank=True, null=True)
     type = models.CharField(max_length=10, choices=TYPE)
