@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.gis.geos import GEOSGeometry
 
 
 class EventAttending(generics.ListCreateAPIView):
@@ -660,12 +661,55 @@ class UserList(generics.ListCreateAPIView):
     """<b>User List</b>"""
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    allowed_methods = ['get']
+    allowed_methods = ['get', 'post']
 
     #def finalize_response(self, request, *args, **kwargs):
     #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
     #    response['last_object_update'] = getListLastUpdate(self.get_queryset())
     #    return response
+
+    @csrf_exempt
+    def post(self, request):
+        """
+        Creates a User
+
+
+
+        <b>Details</b>
+
+        METHODS : POST
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        - 400 BAD REQUEST.
+
+        ---
+        omit_parameters:
+        - form
+        """
+
+        print request.data
+
+        if 'id' in request.data:
+            try:
+                # user already exists
+                CustomUser.objects.get(pk=request.data['id'])
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except:
+                # user doesnt exist
+                user = CustomUser.objects.create(id=request.data['id'])
+                # check for interests
+                if 'latitude' in request.data and 'longitude' in request.data:
+                    user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
+                                                 str(request.data['longitude']) + ')')
+                    user.save()
+                return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
     def get(self, request):
