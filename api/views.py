@@ -803,7 +803,7 @@ class UserDetails(generics.ListCreateAPIView):
 
     def put(self, request, pk=None):
         """
-        Gets user for a given pk
+        Edits user for a given pk
 
 
 
