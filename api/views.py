@@ -931,7 +931,7 @@ class UserDistance(generics.ListCreateAPIView):
 
     def get(self, request):
         """
-        Gets every User
+        Gets Users for interest ordered by distance
 
 
 
