@@ -234,7 +234,7 @@ class EventList(generics.ListCreateAPIView):
             "longitude": 9.3019203,
             "host": 3,
             "attending": 3,
-            "beggining": "2008-04-10 11:47:58",
+            "beginning": "2008-04-10 11:47:58",
             "end": "'2008-04-10 11:47:58'",
             "cost": 4,
             "type": "PUB",
@@ -255,6 +255,7 @@ class EventList(generics.ListCreateAPIView):
         - form
         """
 
+
         if 'title' in request.data and 'subtitle' in request.data and 'description' in request.data\
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
                 and 'host' in request.data and 'beginning' in request.data and "type" in request.data and \
@@ -263,7 +264,6 @@ class EventList(generics.ListCreateAPIView):
 
 
             try:
-
                 event = Event.objects.create(title = request.data['title'],
                                              subtitle = request.data['subtitle'],
                                              description = request.data['description'],
@@ -274,6 +274,7 @@ class EventList(generics.ListCreateAPIView):
                                              beginning = dateutil.parser.parse(request.data['beginning']),
                                              type = request.data['type'],
                                              min_people = request.data['min_people'])
+
 
                 if 'cost' in request.data:
                     event.cost = request.data['cost']
@@ -286,10 +287,10 @@ class EventList(generics.ListCreateAPIView):
 
                 event.save()
 
-
-                return Response(status=status.HTTP_200_OK, data=event.pk)
+                return Response(status=status.HTTP_200_OK, data=event.id)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventDetails(generics.ListCreateAPIView):
@@ -979,5 +980,60 @@ class UserDistance(generics.ListCreateAPIView):
                 self.queryset = resp
             except:
                 self.queryset = []
+
+        return self.list(request)
+
+
+class EventDistance(generics.ListCreateAPIView):
+    """<b>Event List by distance</b>"""
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    allowed_methods = ['get']
+
+    #def finalize_response(self, request, *args, **kwargs):
+    #    response = super(ThemeList, self).finalize_response(request, *args, **kwargs)
+    #    response['last_object_update'] = getListLastUpdate(self.get_queryset())
+    #    return response
+
+
+
+
+
+    def get(self, request):
+        """
+        Gets Events ordered by distance
+
+
+
+        <b>Details</b>
+
+        METHODS : GET
+
+
+        {
+
+        "latitude": 8.23942349,
+
+        "longitude": 9.1238971
+
+        }
+
+
+
+        <b>RETURNS:</b>
+
+        - 200 OK.
+
+        longitude -- Longitude of point to search from
+        latitude -- Latitude of point to search from
+        ---
+        omit_parameters:
+        - form
+        """
+
+        if 'longitude' in self.request.GET.keys() and 'latitude' in self.request.GET.keys():
+            point = GEOSGeometry('POINT(' + str(request.GET['longitude']) + ' ' +
+                                                 str(request.GET['latitude']) + ')')
+            self.queryset = Event.objects.distance(point).order_by('distance')
 
         return self.list(request)
