@@ -20,6 +20,6 @@ class EventSerializer(serializers.ModelSerializer):
         return geojson.Point((obj.location.x, obj.location.y))
 
     def get_distance(self, obj):
-        if not obj or not obj.distance:
+        if not obj or not hasattr(obj, 'distance') or not obj.distance:
             return None
         return float(str(obj.distance)[:-2])
