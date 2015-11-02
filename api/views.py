@@ -12,6 +12,15 @@ from django.contrib.gis.geos import GEOSGeometry
 import json
 import dateutil.parser
 
+# hack to disable CSRF check
+class AuthenticationApi(generics.ListCreateAPIView):
+    """
+    Login/Signup.
+    """
+
+    def perform_authentication(self, request):
+        pass
+
 
 class EventAttending(generics.ListCreateAPIView):
     """<b>Attending Events</b>"""
