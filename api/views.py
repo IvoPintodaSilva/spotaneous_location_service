@@ -846,9 +846,22 @@ class UserDetails(generics.ListCreateAPIView):
             int_pk = int(pk)
             user = self.queryset.get(pk=int_pk)
             if 'latitude' in request.data and 'longitude' in request.data:
-                    user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
+                user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
                                                  str(request.data['longitude']) + ')')
-                    user.save()
+                user.save()
+
+            if 'interests' in request.data:
+                    for interest in request.data['interests']:
+                        try:
+                            i = Interest.objects.get(name__iexact=interest)
+                            user.interests.add(i)
+                            user.save()
+                        except:
+                            i = Interest.objects.create(name=interest)
+                            i.save()
+                            user.interests.add(i)
+                            user.save()
+
         except:
             self.queryset = []
         return self.list(request)
