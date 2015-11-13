@@ -423,11 +423,15 @@ class EventDetails(generics.ListCreateAPIView):
             if 'interest' in request.data:
                 event.interest = request.data['interest']
 
-            #if 'latitude' in request.data and 'longitude' in request.data:
-            #    location = ...
+            if 'latitude' in request.data and 'longitude' in request.data:
+                event.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
+                                            str(request.data['longitude']) + ')')
 
-            #if 'beggining' in request.data:
-            #    event.beggining = ...
+            if 'beggining' in request.data:
+                event.beggining = dateutil.parser.parse(request.data['beginning'])
+
+            if 'end' in request.data:
+                event.end = dateutil.parser.parse(request.data['end'])
 
             if "type" in request.data:
                 event.type = request.data['type']
@@ -437,6 +441,9 @@ class EventDetails(generics.ListCreateAPIView):
 
             if 'max_people' in request.data:
                 event.max_people = request.data['max_people']
+
+            if 'cost' in request.data:
+                event.cost = request.data['max_people']
 
             event.save()
 
