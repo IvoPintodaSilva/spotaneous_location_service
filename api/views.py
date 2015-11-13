@@ -251,6 +251,16 @@ class EventList(generics.ListCreateAPIView):
             "max_people": 5
         }
 
+        optional fields:
+
+        - subtitle
+
+        - cost
+
+        - max_people
+
+        - end
+
 
 
         <b>RETURNS:</b>
@@ -265,7 +275,7 @@ class EventList(generics.ListCreateAPIView):
         """
 
 
-        if 'title' in request.data and 'subtitle' in request.data and 'description' in request.data\
+        if 'title' in request.data  and 'description' in request.data\
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
                 and 'host' in request.data and 'beginning' in request.data and "type" in request.data and \
                 'min_people' in request.data:
@@ -274,7 +284,6 @@ class EventList(generics.ListCreateAPIView):
 
             try:
                 event = Event.objects.create(title = request.data['title'],
-                                             subtitle = request.data['subtitle'],
                                              description = request.data['description'],
                                              interest = Interest.objects.get(pk=int(request.data['interest'])),
                                              location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
@@ -284,6 +293,8 @@ class EventList(generics.ListCreateAPIView):
                                              type = request.data['type'],
                                              min_people = request.data['min_people'])
 
+                if 'subtitle' in request.data:
+                    event.subtitle = request.data['subtitle']
 
                 if 'cost' in request.data:
                     event.cost = request.data['cost']
