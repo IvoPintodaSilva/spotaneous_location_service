@@ -11,7 +11,7 @@ TYPE = (
 
 class Event(models.Model):
     title = models.CharField(max_length=30)
-    subtitle = models.CharField(max_length=50)
+    subtitle = models.CharField(max_length=50, null=True, blank=True)
     description = models.CharField(max_length=250)
     interest = models.ForeignKey(Interest)
     location = models.PointField(blank=True, null=True)

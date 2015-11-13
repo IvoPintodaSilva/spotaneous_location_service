@@ -275,7 +275,7 @@ class EventList(generics.ListCreateAPIView):
         """
 
 
-        if 'title' in request.data  and 'description' in request.data\
+        if 'title' in request.data  and 'description' in request.data \
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
                 and 'host' in request.data and 'beginning' in request.data and "type" in request.data and \
                 'min_people' in request.data:
