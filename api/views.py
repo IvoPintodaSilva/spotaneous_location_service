@@ -1052,9 +1052,7 @@ class EventDistance(generics.ListCreateAPIView):
 
         {
 
-        "latitude": 8.23942349,
-
-        "longitude": 9.1238971
+            user_id: 2
 
         }
 
@@ -1071,9 +1069,13 @@ class EventDistance(generics.ListCreateAPIView):
         - form
         """
 
-        if 'longitude' in self.request.GET.keys() and 'latitude' in self.request.GET.keys():
-            point = GEOSGeometry('POINT(' + str(request.GET['longitude']) + ' ' +
-                                                 str(request.GET['latitude']) + ')')
+        try:
+            user = CustomUser.objects.get(pk=request.GET.get('user_id'))
+
+            point = GEOSGeometry('POINT(' + str(user.location.x) + ' ' +
+                    str(user.location.y) + ')')
             self.queryset = Event.objects.distance(point).order_by('distance')
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return self.list(request)
