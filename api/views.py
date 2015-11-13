@@ -1039,7 +1039,7 @@ class EventDistance(generics.ListCreateAPIView):
 
 
 
-    def get(self, request):
+    def get(self, request, pk=None):
         """
         Gets Events ordered by distance
 
@@ -1050,27 +1050,20 @@ class EventDistance(generics.ListCreateAPIView):
         METHODS : GET
 
 
-        {
-
-            user_id: 2
-
-        }
-
 
 
         <b>RETURNS:</b>
 
         - 200 OK.
 
-        longitude -- Longitude of point to search from
-        latitude -- Latitude of point to search from
         ---
         omit_parameters:
         - form
         """
 
         try:
-            user = CustomUser.objects.get(pk=request.GET.get('user_id'))
+            int_pk=int(pk)
+            user = CustomUser.objects.get(pk=int_pk)
 
             point = GEOSGeometry('POINT(' + str(user.location.x) + ' ' +
                     str(user.location.y) + ')')

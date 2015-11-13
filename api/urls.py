@@ -5,7 +5,7 @@ urlpatterns = [
     #url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^event/$', views.EventList.as_view()),
-    url(r'^event/nearest/$', views.EventDistance.as_view()),
+    url(r'^event/nearest/(?P<pk>[0-9]+)/$', views.EventDistance.as_view()),
     url(r'^event/(?P<pk>[0-9]+)/$', views.EventDetails.as_view()),
     url(r'^event/host/(?P<pk>[0-9]+)/$', views.EventByHost.as_view()),
     url(r'^event/attending/(?P<pk>[0-9]+)/$', views.EventAttending.as_view()),
