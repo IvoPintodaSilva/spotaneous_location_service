@@ -970,7 +970,7 @@ class UserDistance(generics.ListCreateAPIView):
 
 
 
-    def get(self, request):
+    def get(self, request, pk=None):
         """
         Gets Users for interest ordered by distance
 
@@ -981,47 +981,41 @@ class UserDistance(generics.ListCreateAPIView):
         METHODS : GET
 
 
-        {
-
-        "latitude": 8.23942349,
-
-        "longitude": 9.1238971
-
-        }
-
 
 
         <b>RETURNS:</b>
 
         - 200 OK.
 
-        longitude -- Longitude of point to search from
-        latitude -- Latitude of point to search from
-        interest -- Interest of event
         ---
         omit_parameters:
         - form
         """
 
-        if 'longitude' in self.request.GET.keys() and 'latitude' in self.request.GET.keys():
-            point = GEOSGeometry('POINT(' + str(request.GET['longitude']) + ' ' +
-                                                 str(request.GET['latitude']) + ')')
+        try:
+            int_pk=int(pk)
+            event = Event.objects.get(pk=int_pk)
+
+            point = GEOSGeometry('POINT(' + str(event.location.x) + ' ' +
+                                 str(event.location.y) + ')')
 
             self.queryset = CustomUser.objects.distance(point).order_by('distance')
 
-        if 'interest' in self.request.GET.keys():
             try:
                 users = self.queryset
                 resp = []
                 for user in users:
                     interests = user.interests
-                    if interests and Interest.objects.get(name__iexact=request.GET['interest']) in user.interests.all():
+                    if interests and event.interest in user.interests.all():
                         resp += [user]
                 self.queryset = resp
             except:
                 self.queryset = []
 
-        return self.list(request)
+            return self.list(request)
+
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventDistance(generics.ListCreateAPIView):
