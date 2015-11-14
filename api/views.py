@@ -198,7 +198,6 @@ class EventList(generics.ListCreateAPIView):
     #    response['last_object_update'] = getListLastUpdate(self.get_queryset())
     #    return response
 
-
     def get(self, request):
         """
         Gets every Event
@@ -235,21 +234,36 @@ class EventList(generics.ListCreateAPIView):
 
 
         {
-            "title": "New Event",
-            "subtitle": "Subtitle of new event",
-            "description": "Description of new event",
-            "interest": 2,
-            "latitude": 8.99309210,
-            "longitude": 9.3019203,
-            "host": 3,
-            "attending": 3,
-            "beginning": "2008-04-10 11:47:58",
-            "end": "'2008-04-10 11:47:58'",
-            "cost": 4,
-            "type": "PUB",
-            "min_people": 2,
-            "max_people": 5
-        }
+
+        "title": "New Event",
+
+        "subtitle": "Subtitle of new event",
+
+        "description": "Description of new event",
+
+        "interest": 2,
+
+        "latitude": 8.99309210,
+
+        "longitude": 9.3019203,
+
+        "host": 3,
+
+        "attending": 3,
+
+        "beginning": "2015-10-27T15:05:07Z",
+
+        "end": "2015-10-29T15:05:07Z",
+
+        "cost": 4,
+
+        "type": "PUB",
+
+        "min_people": 2,
+
+        "max_people": 5
+
+         }
 
         optional fields:
 
@@ -279,8 +293,6 @@ class EventList(generics.ListCreateAPIView):
                 and 'interest' in request.data and 'latitude' in request.data and 'longitude' in request.data\
                 and 'host' in request.data and 'beginning' in request.data and "type" in request.data and \
                 'min_people' in request.data:
-
-
 
             try:
                 event = Event.objects.create(title = request.data['title'],
