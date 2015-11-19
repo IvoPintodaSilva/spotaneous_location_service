@@ -1079,7 +1079,7 @@ class EventDistance(generics.ListCreateAPIView):
                 for event in self.queryset:
                     if interest == event.interest:
                         resp += [event]
-            self.queryset = resp
+            self.queryset = sorted(resp, key=lambda x: x.distance, reverse=False)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
