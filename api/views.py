@@ -1020,7 +1020,7 @@ class UserDistance(generics.ListCreateAPIView):
                     interests = user.interests
                     if interests and event.interest in user.interests.all():
                         resp += [user]
-                self.queryset = resp
+                self.queryset = sorted(resp, key=lambda x: x.distance, reverse=False)
             except:
                 self.queryset = []
 
