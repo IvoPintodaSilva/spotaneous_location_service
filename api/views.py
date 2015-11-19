@@ -61,11 +61,10 @@ class EventAttending(generics.ListCreateAPIView):
             for event in self.queryset.all():
                 if user in event.attending.all():
                     r += [event]
-            self.queryset = r
+            self.queryset = sorted(r, key=lambda x: x.beginning, reverse=False)
         except:
             self.queryset = []
         return self.list(request)
-
 
     def delete(self, request, pk=None):
         """
@@ -181,7 +180,7 @@ class EventByHost(generics.ListCreateAPIView):
         try:
             int_pk = int(pk)
             host = CustomUser.objects.get(pk=int_pk)
-            self.queryset = self.queryset.filter(host=host)
+            self.queryset = self.queryset.filter(host=host).order_by('beginning')
         except:
             self.queryset = []
         return self.list(request)
