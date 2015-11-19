@@ -299,7 +299,7 @@ class EventList(generics.ListCreateAPIView):
                                              description = request.data['description'],
                                              interest = Interest.objects.get(pk=int(request.data['interest'])),
                                              location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
-                                                                     str(request.data['longitude']) + ')'),
+                                                                     str(request.data['latitude']) + ')'),
                                              host = CustomUser.objects.get(pk=int(request.data['host'])),
                                              beginning = dateutil.parser.parse(request.data['beginning']),
                                              type = request.data['type'],
