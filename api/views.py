@@ -1074,6 +1074,12 @@ class EventDistance(generics.ListCreateAPIView):
             point = GEOSGeometry('POINT(' + str(user.location.x) + ' ' +
                     str(user.location.y) + ')')
             self.queryset = Event.objects.distance(point).order_by('distance')
+            resp = []
+            for interest in user.interests.all():
+                for event in self.queryset:
+                    if interest == event.interest:
+                        resp += [event]
+            self.queryset = resp
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
