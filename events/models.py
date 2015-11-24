@@ -23,6 +23,7 @@ class Event(models.Model):
     type = models.CharField(max_length=10, choices=TYPE)
     min_people = models.IntegerField()
     max_people = models.IntegerField(blank=True, null=True)
+    image = models.ForeignKey('multimedia.Image', blank=True, null=True)
     objects = models.GeoManager()
 
 
