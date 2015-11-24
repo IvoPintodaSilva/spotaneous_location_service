@@ -18,7 +18,7 @@ class EventSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         if not obj or not obj.image:
             return None
-        return "http://192.168.8.217:4180/" + str(obj.image.source_file.url)
+        return "http://192.168.8.217:4180" + str(obj.image.source_file.url)
 
     def get_geojson(self, obj):
         if not obj or not obj.location:
