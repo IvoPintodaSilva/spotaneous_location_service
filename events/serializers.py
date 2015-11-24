@@ -10,9 +10,15 @@ class EventSerializer(serializers.ModelSerializer):
     interest = InterestSerializer()
     location = serializers.SerializerMethodField('get_geojson')
     distance = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
+
+    def get_image(self, obj):
+        if not obj or not obj.image:
+            return None
+        return obj.image.source_file.url
 
     def get_geojson(self, obj):
         if not obj or not obj.location:
