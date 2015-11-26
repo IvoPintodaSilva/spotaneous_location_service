@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.gis.geos import GEOSGeometry
 import json
 import dateutil.parser
+import traceback
 
 # hack to disable CSRF check
 class AuthenticationApi(generics.ListCreateAPIView):
@@ -432,7 +433,7 @@ class EventDetails(generics.ListCreateAPIView):
                 event.description = request.data['description']
 
             if 'interest' in request.data:
-                event.interest = request.data['interest']
+                event.interest = Interest.objects.get(pk=int(request.data['interest']))
 
             if 'latitude' in request.data and 'longitude' in request.data:
                 event.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
@@ -460,7 +461,8 @@ class EventDetails(generics.ListCreateAPIView):
 
             return Response(status=status.HTTP_200_OK)
         except:
-            pass
+            traceback.print_exc()
+	    pass
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
