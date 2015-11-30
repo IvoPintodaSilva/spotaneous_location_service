@@ -59,6 +59,9 @@ class EventAttending(generics.ListCreateAPIView):
             int_pk = int(pk)
             r = []
             user = CustomUser.objects.get(pk=int_pk)
+            point = GEOSGeometry('POINT(' + str(user.location.x) + ' ' +
+                    str(user.location.y) + ')')
+            self.queryset = Event.objects.distance(point)
             for event in self.queryset.all():
                 if user in event.attending.all():
                     r += [event]
@@ -181,6 +184,9 @@ class EventByHost(generics.ListCreateAPIView):
         try:
             int_pk = int(pk)
             host = CustomUser.objects.get(pk=int_pk)
+            point = GEOSGeometry('POINT(' + str(host.location.x) + ' ' +
+                    str(host.location.y) + ')')
+            self.queryset = Event.objects.distance(point)
             self.queryset = self.queryset.filter(host=host).order_by('beginning')
         except:
             self.queryset = []
