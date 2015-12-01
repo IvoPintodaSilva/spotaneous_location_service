@@ -768,7 +768,7 @@ class UserList(generics.ListCreateAPIView):
                 # check for interests
                 if 'latitude' in request.data and 'longitude' in request.data:
                     user.location = GEOSGeometry('POINT(' + str(request.data['longitude']) + ' ' +
-                                                 str(request.data['longitude']) + ')')
+                                                 str(request.data['latitude']) + ')')
                     user.save()
                 if 'interests' in request.data:
                     for interest in request.data['interests']:
